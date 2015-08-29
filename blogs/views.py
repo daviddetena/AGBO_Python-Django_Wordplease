@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from blogs.models import Blog
+from blogs.models import Blog, Post
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -11,10 +11,8 @@ def home(request):
     :param request:
     :return:
     """
-    blogs = Blog.objects.all()
-    html = '<ul>'
-    for blog in blogs:
-        html+='<li>' + blog.owner.username + '</li>'
-    html+= '</ul>'
-
-    return HttpResponse(html)
+    posts = Post.objects.all().order_by('-published_at')
+    context = {
+        'post_list': posts[:6]
+    }
+    return render(request, 'blogs/home.html', context)

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenido a Wordplease - Como Wordpress, pero en friki</title>
+    <style>
+        ul.post-list{
+            list-style: none;
+        }
+        ul.post-list li{
+            float: left;
+            margin: 20px 20px 20px 0;
+            border:2px solid #f8f8f8;
+            padding: 0 10px 10px 10px;
+            width: 300px;
+        }
+        ul.post-list li:last-child{
+            margin-right: 0;
+        }
+
+        ul.post-list li h4{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido a Wordplease</h1>
+    <p>Wordplease es como Wordpress, pero en friki</p>
+
+    {% if post_list|length > 0 %}
+        <h2>Últimos artículos publicados</h2>
+        <ul class="post-list">
+        {% for post in post_list %}
+            <li>
+                <h4>{{ post.title }}</h4>
+                {% if post.image_url|length > 0 %}
+                <img src="{{ post.image_url }}" alt="{{ post.title }}" width="300"><br>
+                {% endif %}
+                <strong>Blog: </strong> {{ post.blog.owner.username }}<br>
+                {% if post.published_at %}
+                <strong>Fecha de publicación: </strong>{{ post.published_at }}
+                {% else %}
+                <strong>Fecha de creación: </strong>{{ post.created_at }}
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Sé el primero en crear un blog</p>
+    {% endif %}
+</body>
+</html>
