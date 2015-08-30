@@ -4,7 +4,7 @@
 
     {% if post_list|length > 0 %}
         <h3>Últimos posts publicados</h3>
-        {% include 'blogs/post_item.html' %}
+        {% include 'blogs/post_loop.html' %}
     {% else %}
         <p>¡Sé el primero en publicar un post!</p>
     {% endif %}

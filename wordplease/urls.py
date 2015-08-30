@@ -14,7 +14,7 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from blogs.views import HomeView, BlogListView, BlogDetailView, PostDetailView
+from blogs.views import HomeView, BlogListView, BlogDetailView, PostDetailView, CreateView
 from django.conf.urls import include, url
 from django.contrib import admin
 from users.views import LoginView, LogoutView, SignupView
@@ -24,9 +24,9 @@ urlpatterns = [
 
 
     # Users' URLs
-    url(r'^signup/$', SignupView.as_view(), name='user_signup'), # signup o creación de cuenta de usuario, con vista basada en clase SignupView
-    url(r'^login$', LoginView.as_view(), name='user_login'),    # login, con vista basada en clase LoginView
-    url(r'^logout$', LogoutView.as_view(), name='user_logout'), # logout, con vista basada en clase LogoutView
+    url(r'^signup/$', SignupView.as_view(), name='user_signup'),
+    url(r'^login$', LoginView.as_view(), name='user_login'),
+    url(r'^logout$', LogoutView.as_view(), name='user_logout'),
 
 
     # Blogs URLs
@@ -34,4 +34,5 @@ urlpatterns = [
     url(r'^blogs/$', BlogListView.as_view(), name='blog_list'),
     url(r'^blogs/(?P<username>[a-z]+)$', BlogDetailView.as_view(), name='blog_detail'),
     url(r'^blogs/(?P<username>[a-z]+)/(?P<pk>[0-9]+)', PostDetailView.as_view(), name='post_detail'),
+    url(r'^new-post/$', CreateView.as_view(), name='post_create'),
 ]

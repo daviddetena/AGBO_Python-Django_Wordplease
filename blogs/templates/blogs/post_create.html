@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Crear post
+{% endblock %}
+
+{% block section %}
+    <h3>Crear nuevo post</h3>
+    {% if success_message %}
+        <span style="color:green">{{ success_message|safe }}</span>
+    {% endif %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div>
+            <button>Crear post</button>
+        </div>
+    </form>
+{% endblock %}

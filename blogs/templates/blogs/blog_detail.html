@@ -3,10 +3,15 @@
 {% block section %}
 
     {% if post_list|length > 0 %}
-        <h3>Últimos posts publicados</h3>
-        {% include 'blogs/post_item.html' %}
+        <h3>Últimos posts publicados en el blog</h3>
+        {% include 'blogs/post_loop.html' %}
     {% else %}
-        <p>¡Sé el primero en publicar un post!</p>
+        <h3>Este blog aún no tiene artículos publicados</h3>
+    {% endif %}
+
+    {% if unpublished_posts|length > 0 %}
+        <h3>Posts pendientes de publicar en el blog</h3>
+        {% include 'blogs/post_unpublished_loop.html' %}
     {% endif %}
 
 {% endblock %}

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 from datetime import date
+from blogs.forms import PostForm
 from blogs.models import Blog, Post
+from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.views.generic import View
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.views.generic import View
+from django.utils.decorators import method_decorator
+
 
 
 class PostsQuerySet(object):
@@ -52,13 +57,30 @@ class PostsQuerySet(object):
         """
         queryset = Post.objects.filter(blog__owner__username=username)
 
+        posts = queryset
+        return posts
+
+
+        """
+        if not request.user.is_authenticated:
+            posts = queryset.filter(published_at__=date.today)
+        elif request.user.is_superuser or request.user.username == username:
+            posts = queryset
+        else:
+            posts = queryset.filter(published_at__=date.today)
+
+        return posts
+        """
+
+
+        """
         if request.user.is_superuser or (request.user.is_authenticated and request.user.username == username):
             posts = queryset
         else:
             posts = queryset.filter(published_at__lte=date.today)
 
         return posts
-
+        """
 
     def get_post_detail_queryset(self, request, username, pk):
         """
@@ -82,7 +104,8 @@ class HomeView(View, PostsQuerySet):
         """
         posts = self.get_home_posts_queryset()
         context = {
-            #'post_list': posts[:5]
+            #'post_list': posts[:5],
+            'unpublished_posts': None,
             'post_list': posts
         }
         return render(request, 'blogs/home.html', context)
@@ -122,15 +145,38 @@ class BlogDetailView(View, PostsQuerySet):
         :param username: nombre del blog cuyos posts se quieren ver
         :return: HttpResponse
         """
-        possible_posts = self.get_posts_blog_queryset(request, username)
-        if len(possible_posts) > 0:
-            context = {
-                "post_list": possible_posts
-            }
-            return render(request, 'blogs/blog_detail.html', context)
+
+        possible_blogs = Blog.objects.filter(owner__username__exact=username)
+        if len(possible_blogs) == 1:
+            # Existe el blogs. Vemos si tiene posts
+            possible_posts = self.get_posts_blog_queryset(request, username)
+
+            if len(possible_posts) > 0:
+
+                # Comprobamos publicados y no publicados
+                if request.user.is_authenticated and (request.user.is_superuser or request.user.username == username):
+                    published_posts = possible_posts.filter(published_at__lte=date.today).order_by('-published_at')
+                    unpublished_posts = possible_posts.filter(published_at__gt=date.today).order_by('-created_at')
+                else:
+                    published_posts = possible_posts.filter(published_at__lte=date.today).order_by('-published_at')
+                    unpublished_posts = None
+
+                context = {
+                    "post_list": published_posts,
+                    "unpublished_posts": unpublished_posts
+                }
+                return render(request, 'blogs/blog_detail.html', context)
+            else:
+                # Sin posts
+                context = {
+                   "post_list": None
+                }
+                return render(request, 'blogs/blog_detail.html', context)
         else:
             # 404 - blog no encontrado
             return HttpResponseNotFound('No existe el blog')
+
+
 
 
 
@@ -159,3 +205,85 @@ class PostDetailView(View, PostsQuerySet):
         else:
             # error 404 - post no encontrado
             return HttpResponseNotFound('No existe el post')
+
+
+# url /new_post/
+class CreateView(View):
+    """
+    Vista basada en clase para el la creación de post. Tendremos que definir los métodos del HTTP get y post.
+    """
+    @method_decorator(login_required())
+    def get(self, request):
+        """
+        Muestra un formulario para crear un post. Este formulario no se manda nunca por get, por lo que no es
+        necesario incluir mensajes de error.
+        :param request: Objeto HttpRequest con la petición
+        :return: HttpResponse
+        """
+        # Formulario vacío si viene por GET
+        form = PostForm()
+
+        context = {
+            'form': form,
+            'success_message': ''
+        }
+
+        return self.renderize(request, context)
+
+
+    @method_decorator(login_required())
+    def post(self, request):
+        """
+        Crea un post en base a la información POST. Con el decorador @login_required() nos va a ejecutar esta función
+        solamente en el caso de que el usuario esté autenticado. En caso contrario, redirigirá a una url del paquete
+        django.contrib.auth que redefinimos en el settings.py LOGIN_URL. Esta es la magia que hace Django para
+        redireccionar al usuario a una url en el caso de que intente acceder a una url protegida sólo accesible si
+        está autenticado.
+        :param request: Objeto HttpRequest con la petición
+        :return: HttpResponse
+        """
+        success_message = ''
+
+        # Creo un post vacío y le asigno el blog actual.
+        post_with_blog = Post()
+        post_with_blog.blog = request.user.blog
+
+        # Le pedimos al formulario que en vez de usar la instancia que él crea, utilice la que le
+        # indicamos con el post_with_blog. Con esto, guarda la instancia con todos los campos del
+        # formulario, excepto del blog, que coge el que le indicamos nosotros que ha sido creado.
+        form = PostForm(request.POST, instance=post_with_blog)
+
+        if form.is_valid():
+            # Si se valida correctamente creamos objeto post, lo guardamos en DB y lo devolvemos
+            # Obtenemos el blog del usuario autenticado para guardarlo automáticamente.
+            new_post = form.save()
+
+            # Reiniciamos formulario y componemos mensaje con enlace al nuevo post creado. Para acceder a una url
+            # nombrada en un controlador utilizamos la función reverse, con los argumentos de la url nombrada, en este
+            # caso, el nombre del blog, y la pk del post.
+            # Como por defecto Django escapa el HTML, necesitamos indicar que el enlace al nuevo post no escape HTML.
+            # Lo indicamos en la plantilla con el |safe en el mensaje. Lo normal es que este trabajo se haga en el
+            # template
+            form = PostForm()
+            success_message = '¡Post creado con éxito!  '
+            success_message += '<a href="{0}">'.format(reverse('post_detail', args=[new_post.blog, new_post.pk]))
+            success_message += 'Ver post'
+            success_message += '</a>'
+
+        context = {
+            'form': form,
+            'success_message': success_message
+        }
+
+        return self.renderize(request, context)
+
+
+    def renderize(self, request, context):
+        """
+        Cargamos template con los datos del contexto, que incluye el formulario basado en modelo
+        En el template podemos incluir cada campo como <p>, <tr> de table o <li> de <ul>
+        :param request: HttpRequest
+        :param context: Contexto con los datos a los que el template tendrá acceso
+        :return: render que genera el HttpResponse con el context y el template indicados
+        """
+        return render(request, 'blogs/post_create.html', context)

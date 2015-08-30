@@ -1,0 +1,15 @@
+<div class="row post-list">
+    {% for post in post_list %}
+        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+            <h4 class="text-center"><a href="{% url 'post_detail' post.blog.owner.username post.pk %}">{{ post.title }}</a></h4>
+            {% if post.image_url|length > 0 %}
+                <img class="img-rounded" src="{{ post.image_url }}">
+            {% else %}
+                <img class="img-rounded" src="https://dl.dropboxusercontent.com/u/66300733/noimage.jpg">
+            {% endif %}
+            <p>{{ post.summary }}</p>
+            <p><strong>Blog: </strong><a href="{% url 'blog_detail' post.blog.owner.username %}">{{ post.blog.owner.username }}</a></p>
+            <p><strong>Fecha publicación: </strong>{{ post.published_at}}</p>
+        </div>
+    {% endfor %}
+</div>
