@@ -58,7 +58,7 @@ class PostAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
         ('Addional info',{
-            'fields': ('image_url', 'blog', 'categories'),
+            'fields': ('image_url', 'blog', 'categories', 'published_at'),
             'classes': ('wide',)
         })
     )

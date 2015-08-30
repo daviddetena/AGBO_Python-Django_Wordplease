@@ -48,6 +48,7 @@
                 {% if user.is_authenticated %}
                     <ul class="nav navbar-nav list-unstyled list-inline">
                         <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'post_create' %}">Crear post</a></li>
                         <li><a href="{% url 'blog_detail' user %}">Mis posts</a></li>
                     </ul>
                     <ul class="nav navbar-nav list-unstyled list-inline pull-right">

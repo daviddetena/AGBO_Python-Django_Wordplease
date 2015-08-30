@@ -6,22 +6,22 @@ class UserPermissions(BasePermission):
     def has_permission(self, request, view):
         """
         Define si el usuario autenticado en request.user tiene permiso para realizar la acción
-        GET, PUT, POST, DELETE
+        (GET, POST, PUT o DELETE)
         :param request:
         :param view:
         :return:
         """
-        from users.api import UserDetailAPI
 
-        # si se quiere crear un nuevo usuario, sea quien sea puede
-        if request.method == "POST":
+        # POST => se puede crear un usuario siempre
+        if view.action == "create":
             return True
-        # si no es POST,super admin siempre puede
+        # Superadmin => puede hacer todas las operaciones
         elif request.user.is_superuser:
             return True
-        # si es un GET a la vista de detalle, tomo la decisión en has_object_permissions
-        elif isinstance(view, UserDetailAPI):
+        # si es un GET, PUT o DELETE se decide en has_object_permissions
+        elif view.action in ['retrieve', 'update', 'destroy']:
             return True
+        # por defecto no damos permiso
         else:
             # GET a /api/1.0/users/
             return False
@@ -30,11 +30,13 @@ class UserPermissions(BasePermission):
     def has_object_permission(self, request, view, obj):
         """
         Define si el usuario autenticado en request.user tiene permiso para realizar la acción
-        GET, PUT, POST, DELETE sobre el objeto obj
+        (GET, PUT o DELETE)sobre el object obj
         :param request:
         :param view:
         :param obj:
         :return:
         """
-        # Si es superadmin, o el usuario autenticado intenta hacer GET, PUT o DELETE sobre su mismo perfil
+
+        # Sólo damos permiso si es superadmin o si es el usuario autenticado el que intenta hacer
+        # GET, PUT o DELETE sobre su mismo perfil
         return request.user.is_superuser or request.user == obj

@@ -14,31 +14,22 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from blogs.views import HomeView, BlogListView, BlogDetailView, PostDetailView, CreateView
+
 from django.conf.urls import include, url
 from django.contrib import admin
-from users.api import UserListAPI, UserDetailAPI
-from users.views import LoginView, LogoutView, SignupView
+from users import urls as users_urls, api_urls as users_api_urls
+from blogs import urls as blogs_urls, api_urls as blogs_api_urls
+
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
-
-    # Users' URLs
-    url(r'^signup/$', SignupView.as_view(), name='user_signup'),
-    url(r'^login$', LoginView.as_view(), name='user_login'),
-    url(r'^logout$', LogoutView.as_view(), name='user_logout'),
-
-
-    # Blogs URLs
-    url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^blogs/$', BlogListView.as_view(), name='blog_list'),
-    url(r'^blogs/(?P<username>[a-z]+)$', BlogDetailView.as_view(), name='blog_detail'),
-    url(r'^blogs/(?P<username>[a-z]+)/(?P<pk>[0-9]+)', PostDetailView.as_view(), name='post_detail'),
-    url(r'^new-post/$', CreateView.as_view(), name='post_create'),
+    # Blogs' URLs
+    url(r'', include(blogs_urls)),
+    url(r'api/', include(blogs_api_urls)),
 
 
     # Users' API URLs
-    url(r'^api/1.0/users/$', UserListAPI.as_view(), name='user_list_api'),
-    url(r'^api/1.0/users/(?P<pk>[0-9]+)$', UserDetailAPI.as_view(), name='user_detail_api'),
+    url(r'', include(users_urls)),
+    url(r'api/', include(users_api_urls)),
 ]

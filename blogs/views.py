@@ -61,27 +61,6 @@ class PostsQuerySet(object):
         return posts
 
 
-        """
-        if not request.user.is_authenticated:
-            posts = queryset.filter(published_at__=date.today)
-        elif request.user.is_superuser or request.user.username == username:
-            posts = queryset
-        else:
-            posts = queryset.filter(published_at__=date.today)
-
-        return posts
-        """
-
-
-        """
-        if request.user.is_superuser or (request.user.is_authenticated and request.user.username == username):
-            posts = queryset
-        else:
-            posts = queryset.filter(published_at__lte=date.today)
-
-        return posts
-        """
-
     def get_post_detail_queryset(self, request, username, pk):
         """
         Definimos queryset para el detalle de post. Llamamos al método anterior, para que filtre por pk.
@@ -109,7 +88,6 @@ class HomeView(View, PostsQuerySet):
             'post_list': posts
         }
         return render(request, 'blogs/home.html', context)
-
 
 
 class BlogListView(View):
@@ -175,9 +153,6 @@ class BlogDetailView(View, PostsQuerySet):
         else:
             # 404 - blog no encontrado
             return HttpResponseNotFound('No existe el blog')
-
-
-
 
 
 class PostDetailView(View, PostsQuerySet):
