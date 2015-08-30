@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from blogs.models import Blog, Post
 from blogs.permissions import PostPermission
@@ -13,6 +14,11 @@ class BlogsViewSet(ReadOnlyModelViewSet):
     """
     queryset = Blog.objects.all()
 
+    # Definimos clases para búsqueda y filtrado por los campos indicados
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('owner__username')
+    ordering_fields = ('owner', 'created_at')
+
     def get_serializer_class(self):
         return BlogSerializer
 
@@ -25,6 +31,11 @@ class PostsViewSet(PostsQuerySet, ModelViewSet):
     queryset = Post.objects.all()
     pagination_class = PageNumberPagination
     permission_classes = (PostPermission,)
+
+    # Definimos clases para búsqueda y filtrado por los campos indicados
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('title', 'summary', 'body')
+    ordering_fields = ('title', 'published_at')
 
     def get_queryset(self):
         return self.get_posts_queryset(self.request)
