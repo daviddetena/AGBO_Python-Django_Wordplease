@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block section %}
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <h2 class="text-primary">{{ post.title }}</h2>
+            {% if post.image_url|length > 0 %}
+                <img class="img-rounded" height="300" src="{{ post.image_url }}">
+            {% else %}
+                <img class="img-rounded" height="300" src="https://dl.dropboxusercontent.com/u/66300733/noimage.jpg">
+            {% endif %}
+            <p>{{ post.body }}</p>
+            <strong>Autor: </strong>{{ post.blog.owner.first_name}} {{ post.blog.owner.last_name}}
+            <p><strong>Blog: </strong><a href="{% url 'blog_detail' post.blog.owner.username %}">{{ post.blog.owner.username }}</a></p>
+            {% if post.published_at %}
+            <p><strong>Fecha publicación: </strong>{{ post.published_at}}</p>
+            {% else %}
+            <p><strong>Fecha creación: </strong>{{ post.created_at}}</p>
+            {% endif %}
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-8">
+
+        </div>
+    </div>
+{% endblock %}

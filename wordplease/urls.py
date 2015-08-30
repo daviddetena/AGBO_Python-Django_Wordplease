@@ -13,7 +13,7 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from blogs.views import HomeView, BlogListView, BlogDetailView
+from blogs.views import HomeView, BlogListView, BlogDetailView, PostDetailView
 from django.conf.urls import include, url
 from django.contrib import admin
 
@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^blogs/$', BlogListView.as_view(), name='blog_list'),
     url(r'^blogs/(?P<username>[a-z]+)$', BlogDetailView.as_view(), name='blog_detail'),
+    url(r'^blogs/(?P<username>[a-z]+)/(?P<pk>[0-9]+)', PostDetailView.as_view(), name='post_detail'),
 ]

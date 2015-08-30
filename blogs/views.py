@@ -6,10 +6,8 @@ from django.views.generic import View
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 
+
 class PostsQuerySet(object):
-    """
-    Clase que define como se recupera el listado de posts
-    """
 
     def get_home_posts_queryset(self):
         """
@@ -61,6 +59,17 @@ class PostsQuerySet(object):
 
         return posts
 
+
+    def get_post_detail_queryset(self, request, username, pk):
+        """
+        Definimos queryset para el detalle de post. Llamamos al método anterior, para que filtre por pk.
+        """
+        posts = self.get_posts_queryset(request).filter(pk=pk).select_related('blog')
+
+        if len(posts) == 1:
+            return posts[0]
+        else:
+            return None
 
 
 class HomeView(View, PostsQuerySet):
@@ -122,3 +131,31 @@ class BlogDetailView(View, PostsQuerySet):
         else:
             # 404 - blog no encontrado
             return HttpResponseNotFound('No existe el blog')
+
+
+
+class PostDetailView(View, PostsQuerySet):
+    """
+    Vista basada en clase para el detalle de post. Tendremos que definir los métodos del HTTP get y post.
+    En este caso, es sólo por GET
+    """
+    def get(self, request, username, pk):
+        """
+        Método para manejar la vista detalle de un post.
+        :param request: Objeto request con la petición
+        :param pk: Parámetro pk con el identificador del blog cuyo detalle se mostrará
+        :return: render que cargará la vista de detalle del post (por debajo, crea un HttpResponse)
+        """
+
+        # Obtenemos queryset del detalle de post
+        possible_post = self.get_post_detail_queryset(self.request, username, pk)
+        if possible_post is not None:
+            context = {
+                "post": possible_post
+            }
+            # cargamos template con los datos del contexto, que incluye el post a mostrar
+            return render(request, 'blogs/post_detail.html', context)
+
+        else:
+            # error 404 - post no encontrado
+            return HttpResponseNotFound('No existe el post')
