@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """wordplease URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -16,9 +17,17 @@ Including another URLconf
 from blogs.views import HomeView, BlogListView, BlogDetailView, PostDetailView
 from django.conf.urls import include, url
 from django.contrib import admin
+from users.views import LoginView, LogoutView, SignupView
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+
+
+    # Users' URLs
+    url(r'^signup/$', SignupView.as_view(), name='user_signup'), # signup o creación de cuenta de usuario, con vista basada en clase SignupView
+    url(r'^login$', LoginView.as_view(), name='user_login'),    # login, con vista basada en clase LoginView
+    url(r'^logout$', LogoutView.as_view(), name='user_logout'), # logout, con vista basada en clase LogoutView
+
 
     # Blogs URLs
     url(r'^$', HomeView.as_view(), name='home'),

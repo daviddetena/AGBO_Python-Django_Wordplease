@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %} Login {% endblock %}
+
+{% block section %}
+
+{% for error in errors %}
+    <p style="color: red">{{ error }}</p>
+{% endfor%}
+
+<form method="post">
+    <!-- Evitar el Cross-site request forgery -->
+    {% csrf_token %}
+    <table>
+        {{ login_form.as_table }}
+    </table>
+    <div>
+        <button>Entrar</button>
+    </div>
+</form>
+
+{% endblock %}

@@ -45,9 +45,22 @@
     <body>
         <div class="container">
             <nav class="navbar navbar-default">
-                <ul class="nav navbar-nav">
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                </ul>
+                {% if user.is_authenticated %}
+                    <ul class="nav navbar-nav list-unstyled list-inline">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'blog_detail' user %}">Mis posts</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav list-unstyled list-inline pull-right">
+                        <li><a style="font-weight:bold !important" href="javascript:void(0)">{{ user.first_name }} {{ user.last_name }}</a></li>
+                        <li><a href="{% url 'user_logout' %}">Salir</a></li>
+                    </ul>
+                {% else %}
+                    <ul class="nav navbar-nav list-unstyled list-inline">
+                        <li><a href="{% url 'user_login' %}">Entrar</a></li>
+                        <li><a href="{% url 'user_signup' %}">Registrarse</a></li>
+                    </ul>
+                {% endif %}
+
             </nav>
             <hr/>
             <section>
