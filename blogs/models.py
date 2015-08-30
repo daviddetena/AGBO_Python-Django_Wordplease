@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.db import models
-from datetime import datetime
+from datetime import date
 
 
 class Category(models.Model):
@@ -39,7 +39,7 @@ class Post(models.Model):
     image_url = models.URLField(blank=True, null=True, default="")      # Imagen url opcional
     created_at = models.DateTimeField(auto_now_add=True)                # Se guarda la fecha al crearse
     modified_at = models.DateTimeField(auto_now=True)                   # Se actualiza cada vez que se guarde
-    published_at = models.DateTimeField(default=datetime.now)           # Por defecto se publica con la fecha del día
+    published_at = models.DateField(default=date.today)                 # Por defecto se publica con la fecha del día
     categories = models.ManyToManyField(Category, blank=True, null=True)
 
     def __unicode__(self):

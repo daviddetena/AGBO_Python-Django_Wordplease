@@ -1,0 +1,67 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title> {% block title %} Bienvenido a Wordplease {% endblock %}</title>
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/bootstrap-theme.min.css' %}" rel="stylesheet">
+        <style>
+
+            .post-list div{
+                margin: 10px;
+                border:2px solid #f8f8f8;
+                padding: 10px;
+                height: 400px;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .post-list img{
+                width: 270px;
+                max-width: 270px;
+                margin: 5px auto;
+            }
+
+
+            .margin-t-20{
+                margin-top: 20px;
+            }
+
+            .margin-b-20{
+                margin-bottom: 20px;
+            }
+
+            .padding-t-20{
+                padding-top: 20px;
+            }
+
+            .padding-b-20{
+                padding-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <nav class="navbar navbar-default">
+                <ul class="nav navbar-nav">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                </ul>
+            </nav>
+            <hr/>
+            <section>
+                <h1>Bienvenido a WordPlease - como Wordpress, pero en friki</h1>
+                <h2 class="text-muted">KeepCoding Startup Engineering Master Bootcamp, 1st Edition</h2>
+            </section>
+            <hr/>
+            <section>
+                {% block section %} {% endblock %}
+            </section>
+            <section class="padding-b-20">
+                <hr/>
+                <small>WordPlease by David de Tena &copy; All right reserved</small>
+            </section>
+        </div>
+    </body>
+</html>
