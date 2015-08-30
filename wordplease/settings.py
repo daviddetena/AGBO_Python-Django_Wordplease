@@ -40,7 +40,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'wordplease',
     'blogs',
-    'users'
+    'users',
+    'rest_framework'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -126,3 +127,11 @@ LOGGING = {
 
 # LOGIN URL
 LOGIN_URL = '/login'    # cuando un usuario no esté autenticado, redirige a /login
+
+
+# REST_FRAMEWORK
+REST_FRAMEWORK = {
+    'PAGINATE_BY': 5,       # items por página
+    'PAGINATE_BY_PARAM': 'page_size',   # atributo GET con el que se controla el número de elementos por página
+    'MAX_PAGINATE_BY': 10   # máximo número de items por página
+}
